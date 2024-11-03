@@ -1,6 +1,6 @@
-from flask import Flask
-from flask import request
-from flask import jsonify
+from flask import Flask, request, jsonify
+from flask_cors import CORS # import CORS for cross-origin resource sharing
+
 import db
 
 app = Flask(__name__) # Flask constructor takes the name of current module (__name__) as argument
