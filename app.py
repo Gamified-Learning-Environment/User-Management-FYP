@@ -2,11 +2,10 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS # import CORS for cross-origin resource sharing
 import db # import db from db.py
 from routes.auth import auth_bp
-from config import JWT_SECRET_KEY
 
 app = Flask(__name__) # Flask constructor takes the name of current module (__name__) as argument
 
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
 # Register blueprints
 app.register_blueprint(auth_bp)
