@@ -14,7 +14,7 @@ app.config['SESSSION_COOKIE_SECURE'] = False # Ensure session cookie is sent onl
 
 Session(app) # Initialize Session
 
-CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
+CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}}, supports_credentials=True) # Enable CORS on all routes and allow credetials
 
 # Register blueprints
 app.register_blueprint(auth_bp)
