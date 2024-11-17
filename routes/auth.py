@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, session
 # werkzeug is used to hash passwords securely and check them
 from werkzeug.security import generate_password_hash, check_password_hash
 import db
@@ -45,15 +45,15 @@ def register():
 @auth_bp.route('/login', methods=['POST'])
 def login(): # get user data from request and check if user exists in database
     try:
-
         data = request.get_json()
-        
+
         user = db.userdb.usercollection.find_one({'email': data['email']})
         if not user or not check_password_hash(user['password'], data['password']):
             return jsonify({'message': 'Invalid credentials'}), 401
         
         # Convert ObjectId to string
         user['_id'] = str(user['_id'])
+        session['user'] = user # Save user data in session
 
         # Return user data if login is successful
         return jsonify({
@@ -70,3 +70,17 @@ def login(): # get user data from request and check if user exists in database
     except Exception as e:
         print(f"Error: {e}")
         return jsonify({'message': 'Internal Server Error'}), 500
+    
+# /logout route to clear session data
+@auth_bp.route('/logout', methods=['POST'])
+def logout():
+    session.pop('user', None) # Remove user data from session
+    return jsonify({'message': 'Logout successful'}), 200
+
+# /validate route to get user data from session
+@auth_bp.route('/checkSession', methods=['GET'])
+def checkSession():
+    user = session.get('user')
+    if user: 
+        return jsonify({'user': user}), 200
+    return jsonify({'message': 'No active session'}), 401

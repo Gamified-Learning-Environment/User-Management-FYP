@@ -1,9 +1,18 @@
-from flask import Flask, request, jsonify
+from flask import Flask, session, request, jsonify
 from flask_cors import CORS # import CORS for cross-origin resource sharing
+from flask_session import Session # import Session for session management
 import db # import db from db.py
 from routes.auth import auth_bp
 
 app = Flask(__name__) # Flask constructor takes the name of current module (__name__) as argument
+
+# Configure session to store data in filesystem of server
+app.config['SESSION_TYPE'] = 'filesystem'
+app.config['SECRET_KEY'] = 'UserSess7274' 
+app.config['SESSION_COOKIE_HTTPONLY'] = True # Prevent client-side access to session cookie
+app.config['SESSSION_COOKIE_SECURE'] = False # Ensure session cookie is sent only over HTTPS, set True in production
+
+Session(app) # Initialize Session
 
 CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
