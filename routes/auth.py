@@ -121,3 +121,11 @@ def update_user(id):
     if result.modified_count > 0:
         return jsonify({'message': 'User updated successfully'})
     return jsonify({'message': 'User not found'}), 404
+
+# /users/<id> route to delete user by id
+@auth_bp.route('/users/<id>', methods=['DELETE'])
+def delete_user(id):
+    result = db.userdb.usercollection.delete_one({'_id': ObjectId(id)})
+    if result.deleted_count > 0:
+        return jsonify({'message': 'User deleted successfully'})
+    return jsonify({'message': 'User not found'}), 404
