@@ -3,6 +3,7 @@ from flask import Blueprint, request, jsonify, session
 from werkzeug.security import generate_password_hash, check_password_hash
 import db
 from datetime import datetime
+from bson import ObjectId
 
 # Blueprint for auth routes
 auth_bp = Blueprint('auth', __name__, url_prefix='/api/auth')
@@ -84,3 +85,39 @@ def checkSession():
     if user: 
         return jsonify({'user': user}), 200
     return jsonify({'message': 'No active session'}), 401
+
+# /users route to get all users
+@auth_bp.route('/users', methods=['GET'])
+def get_users():
+    users = db.userdb.usercollection.find()
+    response = []
+    for user in users:
+        user['_id'] = str(user['_id'])
+        response.append(user)
+    return jsonify(response)
+
+# /users/<id> route to get user by id
+@auth_bp.route('/users/<id>', methods=['GET'])
+def get_user(id):
+    user = db.userdb.usercollection.find_one({'_id': ObjectId(id)})
+    if user:
+        user['_id'] = str(user['_id'])
+        return jsonify(user)
+    return jsonify({'message': 'User not found'}), 404
+
+# /users/<id> route to update user by id
+@auth_bp.route('/users/<id>', methods=['PUT'])
+def update_user(id):
+    data = request.get_json()
+    updated_user = {
+        'email': data['email'],
+        'password': generate_password_hash(data['password']),
+        'username': data['username'],
+        'firstName': data['firstName'],
+        'lastName': data['lastName'],
+        'imageUrl': data.get('imageUrl', '')
+    }
+    result = db.userdb.usercollection.update_one({'_id': ObjectId(id)}, {'$set': updated_user})
+    if result.modified_count > 0:
+        return jsonify({'message': 'User updated successfully'})
+    return jsonify({'message': 'User not found'}), 404
