@@ -1,10 +1,10 @@
 from flask import Flask, session, request, jsonify
-from flask_cors import CORS # import CORS for cross-origin resource sharing
-from flask_session import Session # import Session for session management
-import db # import db from db.py
+from flask_cors import CORS # import CORS
+from flask_session import Session # import for session management
+import db # import db
 from routes.auth import auth_bp
 
-app = Flask(__name__) # Flask constructor takes the name of current module (__name__) as argument
+app = Flask(__name__) # Flask app instance
 
 # Configure session to store data in filesystem of server
 app.config['SESSION_TYPE'] = 'filesystem'

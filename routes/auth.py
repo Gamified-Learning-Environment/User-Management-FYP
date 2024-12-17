@@ -1,9 +1,8 @@
-from flask import Blueprint, request, jsonify, session
-# werkzeug is used to hash passwords securely and check them
-from werkzeug.security import generate_password_hash, check_password_hash
-import db
+from flask import Blueprint, request, jsonify, session 
+from werkzeug.security import generate_password_hash, check_password_hash # import password hashing functions
+import db # import db
 from datetime import datetime
-from bson import ObjectId
+from bson import ObjectId # import ObjectId to generate unique ids
 
 # Blueprint for auth routes
 auth_bp = Blueprint('auth', __name__, url_prefix='/api/auth')
