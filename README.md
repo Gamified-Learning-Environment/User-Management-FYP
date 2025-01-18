@@ -1,4 +1,4 @@
-Gamified Learning Environment (GLE) - User Management Microservice
+# Gamified Learning Environment (GLE) - User Management Microservice
 Welcome to the User Management Microservice Repository for the Gamified Learning Environment (GLE) project! This microservice handles all user-related operations including authentication, profile management, and user data persistence.
 
 ## Service Overview
