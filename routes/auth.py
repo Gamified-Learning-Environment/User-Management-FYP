@@ -128,3 +128,53 @@ def delete_user(id):
     if result.deleted_count > 0:
         return jsonify({'message': 'User deleted successfully'})
     return jsonify({'message': 'User not found'}), 404
+
+@auth_bp.route('/preferences', methods=['PUT'])
+def update_preferences():
+    try: 
+        data = request.get_json()
+        user_id = session.get('user_id')
+
+        if not user_id:
+            return jsonify({'message': 'Unauthorized'}), 401
+        
+        # update the preferences
+        preferences = {
+            'quizPreferences': {
+                'category': data.get('categories', {}),
+                'defaultQuestionCount': data.get('defaultQuestionCount', 5),
+            }
+        }
+
+        result = db.userdb.usercollection.update_one(
+            {'_id': ObjectId(user_id)},
+            {'$set': preferences}
+        )
+
+        if result.modified_count:
+            return jsonify({'message': 'Preferences updated successfully'}), 200
+        return jsonify({'message': 'Preferences not updated'}), 304
+    
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({'message': 'Internal Server Error'}), 500
+
+
+@auth_bp.route('/preferences', methods=['GET'])
+def get_preferences():
+    try:
+        user_id = session.get('user_id')
+        if not user_id:
+            return jsonify({'message': 'Unauthorized'}), 401
+            
+        user = db.userdb.usercollection.find_one({'_id': ObjectId(user_id)})
+        if not user:
+            return jsonify({'message': 'User not found'}), 404
+            
+        return jsonify(user.get('quizPreferences', {
+            'categories': {},
+            'defaultQuestionCount': 5
+        })), 200
+        
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500
