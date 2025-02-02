@@ -1,8 +1,9 @@
-from flask import Blueprint, request, jsonify, session 
+from flask import Blueprint, request, jsonify, session
 from werkzeug.security import generate_password_hash, check_password_hash # import password hashing functions
 import db # import db
 from datetime import datetime
 from bson import ObjectId # import ObjectId to generate unique ids
+from flask import session
 
 # Blueprint for auth routes
 auth_bp = Blueprint('auth', __name__, url_prefix='/api/auth')
@@ -48,34 +49,78 @@ def login(): # get user data from request and check if user exists in database
         data = request.get_json()
 
         user = db.userdb.usercollection.find_one({'email': data['email']})
-        if not user or not check_password_hash(user['password'], data['password']):
-            return jsonify({'message': 'Invalid credentials'}), 401
         
-        # Convert ObjectId to string
-        user['_id'] = str(user['_id'])
-        session['user'] = user # Save user data in session
-
-        # Return user data if login is successful
-        return jsonify({
-            'message': 'Login successful',
-            'user': {
-                'id': str(user['_id']),
+        #if not user or not check_password_hash(user['password'], data['password']):
+            #return jsonify({'message': 'Invalid credentials'}), 401
+        
+        if user and check_password_hash(user['password'], data['password']):
+             # Store only necessary user info in session
+            session['user'] = {
+                '_id': str(user['_id']),
                 'email': user['email'],
-                'username': user['username'],
-                'firstName': user['firstName'],
-                'lastName': user['lastName'],
-                'imageUrl': user.get('imageUrl', '')
+                'username': user['username']
             }
-        }), 200
+            session.permanent = True
+
+            return jsonify({ # return user data if login is successful
+                'message': 'Login successful',
+                'user': {
+                    'id': str(user['_id']),
+                    'email': user['email'],
+                    'username': user['username'],
+                    'firstName': user['firstName'],
+                    'lastName': user['lastName'],
+                    'imageUrl': user.get('imageUrl', '')
+                }
+            }), 200
+        
+        return jsonify({'message': 'Invalid credentials'}), 401
+    
     except Exception as e:
         print(f"Error: {e}")
         return jsonify({'message': 'Internal Server Error'}), 500
     
-# /logout route to clear session data
-@auth_bp.route('/logout', methods=['POST'])
+# /logout route to clear session data and handle CORS preflight
+@auth_bp.route('/logout', methods=['POST', 'OPTIONS'])
 def logout():
-    session.pop('user', None) # Remove user data from session
-    return jsonify({'message': 'Logout successful'}), 200
+    if request.method == 'OPTIONS':
+        # Handle preflight request
+        return jsonify({'message': 'OK'}), 200
+        
+    try:
+        # Clear session
+        session.clear()
+        return jsonify({'message': 'Logout successful'}), 200
+    except Exception as e:
+        print(f"Error in logout: {str(e)}")
+        return jsonify({'message': 'Error during logout'}), 500
+    
+# /verify route to check if user is logged in
+@auth_bp.route('/verify', methods=['GET'])
+def verify_session():
+    try:
+        if 'user' not in session:
+            return jsonify({'message': 'Unauthorized'}), 401
+            
+        user_id = session['user'].get('_id')
+        if not user_id:
+            print("Invalid user data in session")  # Debug logging
+            return jsonify({'message': 'Invalid session'}), 401
+            
+        user_data = session.get('user')
+        if not user_data or '_id' not in user_data:
+            print("Invalid user data in session")  # Debug logging
+            return jsonify({'message': 'Invalid session'}), 401
+            
+        # Return success with user data
+        return jsonify({
+            'message': 'Session valid',
+            'user': user_data
+        }), 200
+        
+    except Exception as e:
+        print(f"Error verifying session: {str(e)}")
+        return jsonify({'message': 'Server error'}), 500
 
 # /validate route to get user data from session
 @auth_bp.route('/checkSession', methods=['GET'])
@@ -129,6 +174,7 @@ def delete_user(id):
         return jsonify({'message': 'User deleted successfully'})
     return jsonify({'message': 'User not found'}), 404
 
+# /preferences route to update user preferences
 @auth_bp.route('/preferences', methods=['PUT'])
 def update_preferences():
     try: 
@@ -137,6 +183,11 @@ def update_preferences():
 
         if not user_id:
             return jsonify({'message': 'Unauthorized'}), 401
+        
+        try:
+            object_id = ObjectId(user_id)
+        except:
+            return jsonify({'message': 'Invalid user id format'}), 400
         
         # update the preferences
         preferences = {
@@ -159,22 +210,34 @@ def update_preferences():
         print(f"Error: {e}")
         return jsonify({'message': 'Internal Server Error'}), 500
 
-
+# /preferences route to get user preferences
 @auth_bp.route('/preferences', methods=['GET'])
 def get_preferences():
     try:
+        # Explicitly check if user is logged in
+        if 'user_id' not in session:
+            return jsonify({'message': 'Unauthorized - Please log in'}), 401
+        
         user_id = session.get('user_id')
+        
         if not user_id:
             return jsonify({'message': 'Unauthorized'}), 401
-            
+        
+        # Get user preferences, create default if none exist
         user = db.userdb.usercollection.find_one({'_id': ObjectId(user_id)})
         if not user:
             return jsonify({'message': 'User not found'}), 404
             
-        return jsonify(user.get('quizPreferences', {
-            'categories': {},
-            'defaultQuestionCount': 5
-        })), 200
+        # Return default preferences if none exist
+        preferences = user.get('preferences', {
+            'quizPreferences': {
+                'category': {},
+                'defaultQuestionCount': 5
+            }
+        })
+            
+        return jsonify(preferences), 200
         
     except Exception as e:
+        print(f"Error in get_preferences: {str(e)}")  # Add logging
         return jsonify({'message': str(e)}), 500

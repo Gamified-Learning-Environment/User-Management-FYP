@@ -15,10 +15,7 @@ def create_user():
         'username': data['username'],
         'firstName': data['firstName'],
         'lastName': data['lastName'],
-        'photo': data['photo'],
-        'preferences': {
-            'categories': {} # Will store user's preferences for different categories
-        }
+        'photo': data['photo']
     }
     result = db.user_collection.insert_one(user) # insert the user into the database
     print(result.inserted_id)

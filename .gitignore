@@ -112,3 +112,4 @@ dmypy.json
 
 # flask session files
 flask_session/
+__pycache__/
