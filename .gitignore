@@ -56,6 +56,7 @@ coverage.xml
 # Flask specific
 instance/
 .webassets-cache
+flask_session/
 
 # Scrapy stuff:
 .scrapy
@@ -113,3 +114,19 @@ dmypy.json
 # flask session files
 flask_session/
 __pycache__/
+
+# Local configuration with sensitive data
+config.py
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
