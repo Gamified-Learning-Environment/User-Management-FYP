@@ -4,6 +4,7 @@ from flask_session import Session # import for session management
 import db # import db
 from routes.auth import auth_bp
 from datetime import timedelta
+import os
 
 app = Flask(__name__) # Flask app instance
 
@@ -37,7 +38,8 @@ Session(app)
 CORS(app, 
     resources={
         r"/api/*": {
-            "origins": ["http://localhost:3000"],
+            #"origins": ["http://localhost:3000"],
+            "origins": os.environ.get('CORS_ORIGINS', '*').split(','),
             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
             "allow_headers": ["Content-Type", "Authorization", "cookie"],
             "expose_headers": ["Content-Type", "Authorization", "Set-Cookie"],
