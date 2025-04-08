@@ -38,8 +38,8 @@ Session(app)
 CORS(app, 
     resources={
         r"/api/*": {
-            #"origins": ["http://localhost:3000"],
-            "origins": os.environ.get('CORS_ORIGINS', '*').split(','),
+            "origins": ["http://localhost:3000"],
+            #"origins": os.environ.get('CORS_ORIGINS', '*').split(','),
             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
             "allow_headers": ["Content-Type", "Authorization", "cookie"],
             "expose_headers": ["Content-Type", "Authorization", "Set-Cookie"],
@@ -73,6 +73,10 @@ def home():
 def insert_data():
     db.userdb.usercollection.insert_one(data)
     return jsonify("Data inserted successfully" + str(data))
+
+@app.route('/api/health')
+def health_check():
+    return jsonify({"status": "healthy"}), 200
 
 
 

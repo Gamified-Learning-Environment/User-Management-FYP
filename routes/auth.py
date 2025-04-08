@@ -175,69 +175,69 @@ def delete_user(id):
     return jsonify({'message': 'User not found'}), 404
 
 # /preferences route to update user preferences
-@auth_bp.route('/preferences', methods=['PUT'])
-def update_preferences():
-    try: 
-        data = request.get_json()
-        user_id = session.get('user_id')
+# @auth_bp.route('/preferences', methods=['PUT'])
+# def update_preferences():
+#     try: 
+#         data = request.get_json()
+#         user_id = session.get('user_id')
 
-        if not user_id:
-            return jsonify({'message': 'Unauthorized'}), 401
+#         if not user_id:
+#             return jsonify({'message': 'Unauthorized'}), 401
         
-        try:
-            object_id = ObjectId(user_id)
-        except:
-            return jsonify({'message': 'Invalid user id format'}), 400
+#         try:
+#             object_id = ObjectId(user_id)
+#         except:
+#             return jsonify({'message': 'Invalid user id format'}), 400
         
-        # update the preferences
-        preferences = {
-            'quizPreferences': {
-                'category': data.get('categories', {}),
-                'defaultQuestionCount': data.get('defaultQuestionCount', 5),
-            }
-        }
+#         # update the preferences
+#         preferences = {
+#             'quizPreferences': {
+#                 'category': data.get('categories', {}),
+#                 'defaultQuestionCount': data.get('defaultQuestionCount', 5),
+#             }
+#         }
 
-        result = db.userdb.usercollection.update_one(
-            {'_id': ObjectId(user_id)},
-            {'$set': preferences}
-        )
+#         result = db.userdb.usercollection.update_one(
+#             {'_id': ObjectId(user_id)},
+#             {'$set': preferences}
+#         )
 
-        if result.modified_count:
-            return jsonify({'message': 'Preferences updated successfully'}), 200
-        return jsonify({'message': 'Preferences not updated'}), 304
+#         if result.modified_count:
+#             return jsonify({'message': 'Preferences updated successfully'}), 200
+#         return jsonify({'message': 'Preferences not updated'}), 304
     
-    except Exception as e:
-        print(f"Error: {e}")
-        return jsonify({'message': 'Internal Server Error'}), 500
+#     except Exception as e:
+#         print(f"Error: {e}")
+#         return jsonify({'message': 'Internal Server Error'}), 500
 
-# /preferences route to get user preferences
-@auth_bp.route('/preferences', methods=['GET'])
-def get_preferences():
-    try:
-        # Explicitly check if user is logged in
-        if 'user_id' not in session:
-            return jsonify({'message': 'Unauthorized - Please log in'}), 401
+# # /preferences route to get user preferences
+# @auth_bp.route('/preferences', methods=['GET'])
+# def get_preferences():
+#     try:
+#         # Explicitly check if user is logged in
+#         if 'user_id' not in session:
+#             return jsonify({'message': 'Unauthorized - Please log in'}), 401
         
-        user_id = session.get('user_id')
+#         user_id = session.get('user_id')
         
-        if not user_id:
-            return jsonify({'message': 'Unauthorized'}), 401
+#         if not user_id:
+#             return jsonify({'message': 'Unauthorized'}), 401
         
-        # Get user preferences, create default if none exist
-        user = db.userdb.usercollection.find_one({'_id': ObjectId(user_id)})
-        if not user:
-            return jsonify({'message': 'User not found'}), 404
+#         # Get user preferences, create default if none exist
+#         user = db.userdb.usercollection.find_one({'_id': ObjectId(user_id)})
+#         if not user:
+#             return jsonify({'message': 'User not found'}), 404
             
-        # Return default preferences if none exist
-        preferences = user.get('preferences', {
-            'quizPreferences': {
-                'category': {},
-                'defaultQuestionCount': 5
-            }
-        })
+#         # Return default preferences if none exist
+#         preferences = user.get('preferences', {
+#             'quizPreferences': {
+#                 'category': {},
+#                 'defaultQuestionCount': 5
+#             }
+#         })
             
-        return jsonify(preferences), 200
+#         return jsonify(preferences), 200
         
-    except Exception as e:
-        print(f"Error in get_preferences: {str(e)}")  # Add logging
-        return jsonify({'message': str(e)}), 500
+#     except Exception as e:
+#         print(f"Error in get_preferences: {str(e)}")  # Add logging
+#         return jsonify({'message': str(e)}), 500
