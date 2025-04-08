@@ -38,7 +38,7 @@ Session(app)
 CORS(app, 
     resources={
         r"/api/*": {
-            "origins": ["http://localhost:3000"],
+            "origins": ["http://localhost:3000", "https://exper-frontend-production.up.railway.app"],
             #"origins": os.environ.get('CORS_ORIGINS', '*').split(','),
             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
             "allow_headers": ["Content-Type", "Authorization", "cookie"],
