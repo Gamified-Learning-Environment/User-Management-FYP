@@ -52,9 +52,6 @@ CORS(app,
 # Register blueprints
 app.register_blueprint(auth_bp)
 
-if __name__ == "__main__":
-    app.run(debug=True, port=8080)
-
 # test data
 data = {
     "name": "John",
