@@ -39,14 +39,15 @@ CORS(app,
     resources={
         r"/api/*": {
             "origins": ["http://localhost:3000", "https://exper-frontend-production.up.railway.app"],
-            #"origins": os.environ.get('CORS_ORIGINS', '*').split(','),
             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-            "allow_headers": ["Content-Type", "Authorization", "cookie"],
+            "allow_headers": ["Content-Type", "Authorization", "Accept", "cookie"],
             "expose_headers": ["Content-Type", "Authorization", "Set-Cookie"],
             "supports_credentials": True,
-            "allow_credentials": True
+            "allow_credentials": True,
+            "max_age": 120
         }
-    }
+    },
+    supports_credentials=True
 )
 
 # Register blueprints
