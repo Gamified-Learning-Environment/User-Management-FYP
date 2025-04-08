@@ -1,6 +1,5 @@
 from flask import Flask
 import pymongo # import pymongo
-from config import MONGODB_URI
 import os
 
 # Try to import from config, fall back to environment variable if config not available
