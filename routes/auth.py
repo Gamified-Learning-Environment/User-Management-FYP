@@ -95,7 +95,7 @@ def logout():
         print(f"Error in logout: {str(e)}")
         return jsonify({'message': 'Error during logout'}), 500
     
-# /verify route to check if user is logged in
+# /verify route to authenticate if user is logged in
 @auth_bp.route('/verify', methods=['GET'])
 def verify_session():
     try:
