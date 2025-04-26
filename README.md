@@ -3,48 +3,13 @@ Welcome to the User Management Microservice Repository for the Gamified Learning
 
 ## Service Overview
 This microservice is part of a larger ecosystem designed to create an engaging online learning environment. It provides the fundamental user management capabilities that support the platform's personalized learning experience and gamification features.
+The User Management microservice handles user creation, authentication, authorisation and general management of users within the GLE. Its built using Python with Flask. During its development, user security was kept in mind. From the beginning it was obvious that correctly handling and storing user's data was crucial for a gamified quiz platform like this, so it became a core pillar of the architecture. 
 
-## Features
-### Core Authentication Features
-1. User Authentication:
-  - Secure login and registration system
-  - Session management and persistence
-  - Token-based authentication for microservice communication
-
-
-2. Profile Management:
-  - User profile creation and updates
-  - Account settings management
-
-
-3. Data Management:
-
-  - Secure storage of user credentials
-  - Profile data persistence
-  - Integration with gamification tracking
-
-## Technologies Used
-### Backend Framework
-- Flask: Python-based RESTful API development
-- MongoDB: Document-based storage for user data
-  - Utilizing JSON format
-  - Key-value pair storage for efficient data retrieval
-
-
-## API Endpoints
-The service exposes RESTful endpoints for:
-- User registration
-- Authentication
-- Profile management
-- Session handling
-
-## System Architecture
-### Microservice Integration
-This service is one of four independent microservices in the GLE platform:
-- User Management (This service)
-- Quiz Generation
-- Results Tracking
-- Gamification
+Key features include: 
+    - Authentication System: JSON Web Tokens are implemented for secure, stateless authentication. The system supports email and password authentication and full management of the user's state. 
+    - User Profiles: Manages user data including personal information, profile images and names. Profiles are stored in MongoDB, making use of its flexible document structure in case requirements shifted during development.
+    - Authorisation: A degree of authorisation is implemented through this service, whereupon the frontend must send a RESTful request to authorise the existence of a user within the database before allowing them to access the services. 
+    - Security Features: For user security and peace of mind, incorporates password hashing and password hash checking with Werkzeug for securely storing passwords without putting the user's account at risk. 
 
 ## Deployment and Running
 While you could download, compile and run each of the repositories for this Final Year Project and get a more in depth look into the code, it is also fully deployed on Railway at the following link : https://exper-frontend-production.up.railway.app
